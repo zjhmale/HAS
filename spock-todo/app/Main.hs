@@ -38,8 +38,8 @@ app = do
       jsonBody' >>= runQuery' . newPost uid >>= json
 
     put ("posts" <//> var) $ \pid ->
-      requireAuth onfail $ \_ ->
-      jsonBody' >>= runQuery' . editPost pid >>= json
+      requireAuth onfail $ \(uid, _) ->
+      jsonBody' >>= runQuery' . editPost pid uid >>= json
 
     delete ("posts" <//> var) $ \pid ->
       requireAuth onfail $ \_ -> do

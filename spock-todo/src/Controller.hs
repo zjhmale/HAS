@@ -70,17 +70,20 @@ newPost uid (PostView title content) = do
   newid <- insertPost post
   return APIResult {ok=True, output="New post #" ++ show newid ++ " created."}
 
-editPost :: Int64 -> PostView -> Query APIResult
-editPost pid (PostView title content) = do
+editPost :: Int64 -> Int64 -> PostView -> Query APIResult
+editPost pid uid (PostView title content) = do
   maybeOrig <- getPostById pid
   case maybeOrig of
     Nothing -> return APIResult {ok=False, output="Post not found."}
-    Just orig -> do
-      let post = orig { postTitle = title
+    Just orig@Post{..} ->
+      if fromSqlKey postAuthorId == uid
+        then do
+        let post = orig { postTitle = title
                       , postContent = content
                       }
-      updatePost pid post
-      return APIResult {ok=True, output="Post updated."}
+        updatePost pid post
+        return APIResult {ok=True, output="Post updated."}
+        else return APIResult {ok=False, output="Not authorized."}
 
 removePost :: Int64 -> Query APIResult
 removePost pid = do
