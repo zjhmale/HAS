@@ -40,7 +40,7 @@ loginSignupPost username password _type = do
                  let hashPassword =  decodeUtf8 $ makePasswordSalt (encodeUtf8 password) salt 17
                  userid <- addUser username hashPassword
                  insertedUser <- getUserByUsername username
-                 return (True, show userid, insertedUser)
+                 return (True, show . fromSqlKey $ userid, insertedUser)
            _ -> return (False, "?", Nothing)
   return (object ["ok" .= ok', "err" .= err'], sess)
 

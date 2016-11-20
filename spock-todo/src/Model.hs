@@ -11,7 +11,8 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Model(
-  getAppCfg
+  connectionInfo
+, getAppCfg
 , Query
 , allPostIdTitles
 , getPostById
@@ -23,6 +24,7 @@ module Model(
 , SqlBackend
 , fromSqlKey
 , toSqlKey
+, migrateAll
 , User(..)
 , Post(..)
 , Env(..)) where
