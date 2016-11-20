@@ -78,21 +78,24 @@ editPost pid uid (PostView title content) = do
     Just orig@Post{..} ->
       if fromSqlKey postAuthorId == uid
         then do
-        let post = orig { postTitle = title
-                      , postContent = content
-                      }
-        updatePost pid post
-        return APIResult {ok=True, output="Post updated."}
+          let post = orig { postTitle = title
+                          , postContent = content
+                          }
+          updatePost pid post
+          return APIResult {ok=True, output="Post updated."}
         else return APIResult {ok=False, output="Not authorized."}
 
-removePost :: Int64 -> Query APIResult
-removePost pid = do
+removePost :: Int64 -> Int64 -> Query APIResult
+removePost pid uid = do
   maybeOrig <- getPostById pid
   case maybeOrig of
     Nothing -> return APIResult {ok=False, output="Post not found."}
-    Just orig -> do
-      deletePost pid
-      return APIResult {ok=True, output="Post deleted."}
+    Just orig@Post{..} ->
+      if fromSqlKey postAuthorId == uid
+      then do
+        deletePost pid
+        return APIResult {ok=True, output="Post deleted."}
+      else return APIResult {ok=False, output="Not authorized."}
 
 getPost :: Int64 -> Query Value
 getPost pid = do

@@ -42,8 +42,8 @@ app = do
       jsonBody' >>= runQuery' . editPost pid uid >>= json
 
     delete ("posts" <//> var) $ \pid ->
-      requireAuth onfail $ \_ -> do
-      r <- runQuery' $ removePost pid
+      requireAuth onfail $ \(uid, _) -> do
+      r <- runQuery' $ removePost pid uid
       json r
 
     get "posts" $
