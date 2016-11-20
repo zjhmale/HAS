@@ -78,3 +78,13 @@ editPost pid (PostView title content) = do
                       }
       updatePost pid post
       return APIResult {ok=True, output="Post updated."}
+
+removePost :: Int64 -> Query APIResult
+removePost pid = do
+  maybeOrig <- getPostById pid
+  case maybeOrig of
+    Nothing -> return APIResult {ok=False, output="Post not found."}
+    Just orig -> do
+      deletePost pid
+      return APIResult {ok=True, output="Post deleted."}
+

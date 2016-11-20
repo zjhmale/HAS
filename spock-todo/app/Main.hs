@@ -29,18 +29,22 @@ main = runConnPool $ \pool -> do
 app :: SpockM SqlBackend (Maybe (Int64, User)) state ()
 app = do
     middleware logStdoutDev
+    let onfail = json $ object ["ok" .= False, "err" .= ("Session expired." :: String)] 
 
     get root $ let msg = "welcome" :: String in json $ object ["msg" .= msg]
 
     post "posts" $
-      let onfail = json $ object ["ok" .= False, "err" .= ("Session expired." :: String)] in
       requireAuth onfail $ \(uid, _) ->
-        json =<< runQuery' . newPost uid =<< jsonBody'
+      jsonBody' >>= runQuery' . newPost uid >>= json
 
     put ("posts" <//> var) $ \pid ->
-      let onfail = json $ object ["ok" .= False, "err" .= ("Session expired." :: String)] in
       requireAuth onfail $ \_ ->
-          json =<< runQuery' . editPost pid =<< jsonBody'
+      jsonBody' >>= runQuery' . editPost pid >>= json
+
+    delete ("posts" <//> var) $ \pid ->
+      requireAuth onfail $ \_ -> do
+      r <- runQuery' $ removePost pid
+      json r
 
     post "login" $ do
       username <- param' "username"

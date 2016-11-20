@@ -17,6 +17,7 @@ module Model(
 , getPostById
 , updatePost
 , insertPost
+, deletePost
 , addUser
 , getUserByUsername
 , SqlBackend
@@ -30,7 +31,7 @@ import Data.Text (Text)
 import Data.Int (Int64)
 import Control.Arrow
 import Database.Persist.TH
-import Database.Persist.MySQL hiding ((==.), (=.), update)
+import Database.Persist.MySQL hiding ((==.), (=.), update, delete)
 import Control.Monad.Reader
 import Control.Monad.Logger
 import Control.Monad.Trans.Resource (runResourceT)
@@ -106,6 +107,12 @@ updatePost pid Post{..} = runDb $
 
 insertPost :: Post -> Query Int64
 insertPost post = fromSqlKey <$> runDb (insert post)
+
+deletePost :: Int64 -> Query ()
+deletePost pid = runDb $
+  delete $
+  from $ \post ->
+  where_ (post ^. PostId ==. valkey pid)
 
 getUserByUsername :: Text -> Query (Maybe (Int64, User))
 getUserByUsername username = runDb $ do
