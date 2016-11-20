@@ -11,7 +11,7 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Model(
-  runConnPool
+  getAppCfg
 , Query
 , allPostIdTitles
 , getPostById
@@ -40,6 +40,7 @@ import           Database.Persist.MySQL       hiding (delete, update, (=.),
                                                (==.))
 import           Database.Persist.TH
 import           GHC.Generics                 (Generic)
+import           Web.Spock.Config
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 User json
@@ -63,11 +64,24 @@ connectionInfo = defaultConnectInfo
   , connectDatabase = "todo"
   }
 
-runConnPool :: (ConnectionPool -> IO ()) -> IO ()
-runConnPool action =
+getAppCfg :: IO (SpockCfg SqlBackend (Maybe (Int64, User)) ())
+getAppCfg = do
+  sessionCfg <- defaultSessionCfg Nothing
+  let sessionCfg' = sessionCfg { sc_cookieName = "todo"
+                               , sc_sessionTTL = 604800 -- one week
+                               }
+
+  pool <- runStdoutLoggingT $ createMySQLPool connectionInfo 10
+  runResourceT . runStdoutLoggingT . liftIO $ runSqlPersistMPool (runMigration migrateAll) pool
+  appCfg <- defaultSpockCfg Nothing (PCPool pool) ()
+  return $ appCfg { spc_maxRequestSize = Just (5 * 1024 * 1024)
+                  , spc_sessionCfg = sessionCfg'
+                  }
+  {-
   runResourceT . runStdoutLoggingT $ withMySQLPool connectionInfo 10 $ \pool -> liftIO $ do
     runSqlPersistMPool (runMigration migrateAll) pool
     action pool
+  -}
 
 data Env = Env {
     sqlHandler :: SqlBackend

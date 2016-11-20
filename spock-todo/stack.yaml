@@ -7,7 +7,9 @@ extra-deps:
 - call-stack-0.1.0
 - conduit-extra-1.1.15
 - esqueleto-2.4.3
+- hspec-2.3.2
 - hspec-core-2.3.2
+- hspec-discover-2.3.2
 - hspec-expectations-0.8.2
 - http-api-data-0.2.4
 - mysql-0.1.4

@@ -16,6 +16,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Model
                      , Controller
+                     , Route
   build-depends:       base
                      , text
                      , bytestring
@@ -36,6 +37,10 @@ library
                      , xss-sanitize
                      , time
                      , unix
+                     , wai
+                     , wai-middleware-static
+                     , wai-extra
+                     , Spock
   default-language:    Haskell2010
 
 executable spock-todo
@@ -46,18 +51,22 @@ executable spock-todo
                      , spock-todo
                      , text
                      , mtl
-                     , Spock
-                     , wai-middleware-static
-                     , wai-extra
                      , aeson
   default-language:    Haskell2010
 
 test-suite spock-todo-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
+
   main-is:             Spec.hs
+  other-modules:       AppSpec
   build-depends:       base
                      , spock-todo
+                     , aeson
+                     , wai
+                     , wai-extra
+                     , Spock
+                     , hspec
                      , hspec-wai
                      , QuickCheck
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
