@@ -62,12 +62,12 @@ test-suite spock-todo-test
   other-modules:       AppSpec
   build-depends:       base
                      , spock-todo
-                     , aeson
                      , wai
                      , wai-extra
                      , Spock
                      , hspec
                      , hspec-wai
+                     , hspec-wai-json
                      , QuickCheck
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
