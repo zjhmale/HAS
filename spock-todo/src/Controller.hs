@@ -1,22 +1,21 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric             #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE OverloadedStrings         #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE RecordWildCards           #-}
 
 module Controller where
 
-import GHC.Generics (Generic)
-import Data.Int (Int64)
-import Data.ByteString.Lazy (ByteString)
-import Data.Text as T
-import Data.Text.Encoding (decodeUtf8, encodeUtf8)
-import Data.Aeson
-import Control.Monad.Reader
-import Crypto.PasswordStore
-import Model
-import Data.Time
-import System.Posix.Env (putEnv)
+import           Control.Monad.Reader
+import           Crypto.PasswordStore
+import           Data.Aeson
+import           Data.ByteString.Lazy (ByteString)
+import           Data.Int             (Int64)
+import           Data.Text            as T
+import           Data.Text.Encoding   (decodeUtf8, encodeUtf8)
+import           Data.Time
+import           GHC.Generics         (Generic)
+import           Model
 
 loginSignupPost :: Text -> Text -> Text -> Query (Value, Maybe (Int64, User))
 loginSignupPost username password _type = do
@@ -46,14 +45,14 @@ loginSignupPost username password _type = do
   return (object ["ok" .= ok', "err" .= err'], sess)
 
 data APIResult = APIResult {
-    ok :: Bool
+    ok     :: Bool
   , output :: String
   } deriving Generic
 
 instance ToJSON APIResult
 
 data PostView = PostView
-  { title :: Text
+  { title   :: Text
   , content :: Text
   } deriving Generic
 

@@ -1,14 +1,14 @@
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE EmptyDataDecls             #-}
-{-# LANGUAGE RecordWildCards            #-}
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE FlexibleInstances          #-}
 
 module Model(
   runConnPool
@@ -27,18 +27,19 @@ module Model(
 , Post(..)
 , Env(..)) where
 
-import Data.Text (Text)
-import Data.Int (Int64)
-import Control.Arrow
-import Database.Persist.TH
-import Database.Persist.MySQL hiding ((==.), (=.), update, delete)
-import Control.Monad.Reader
-import Control.Monad.Logger
-import Control.Monad.Trans.Resource (runResourceT)
-import Database.Esqueleto
-import Data.Time
-import GHC.Generics (Generic)
-import Data.Aeson
+import           Control.Arrow
+import           Control.Monad.Logger
+import           Control.Monad.Reader
+import           Control.Monad.Trans.Resource (runResourceT)
+import           Data.Aeson
+import           Data.Int                     (Int64)
+import           Data.Text                    (Text)
+import           Data.Time
+import           Database.Esqueleto
+import           Database.Persist.MySQL       hiding (delete, update, (=.),
+                                               (==.))
+import           Database.Persist.TH
+import           GHC.Generics                 (Generic)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 User json
@@ -70,7 +71,7 @@ runConnPool action =
 
 data Env = Env {
     sqlHandler :: SqlBackend
-  , currUser :: Maybe (Int64, User)
+  , currUser   :: Maybe (Int64, User)
   }
 
 type Query a = ReaderT Env IO a

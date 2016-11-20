@@ -1,17 +1,17 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE PartialTypeSignatures #-}
 
 module Main where
 
-import Data.Aeson (object, (.=))
-import Data.Int (Int64)
-import Control.Monad.Reader
-import System.Environment (lookupEnv)
-import Web.Spock
-import Web.Spock.Config
-import Network.Wai.Middleware.RequestLogger
-import Model
-import Controller
+import           Control.Monad.Reader
+import           Controller
+import           Data.Aeson                           (object, (.=))
+import           Data.Int                             (Int64)
+import           Model
+import           Network.Wai.Middleware.RequestLogger
+import           System.Environment                   (lookupEnv)
+import           Web.Spock
+import           Web.Spock.Config
 
 main :: IO ()
 main = runConnPool $ \pool -> do
@@ -29,7 +29,7 @@ main = runConnPool $ \pool -> do
 app :: SpockM SqlBackend (Maybe (Int64, User)) state ()
 app = do
     middleware logStdoutDev
-    let onfail = json $ object ["ok" .= False, "err" .= ("Session expired." :: String)] 
+    let onfail = json $ object ["ok" .= False, "err" .= ("Session expired." :: String)]
 
     get root $ let msg = "welcome" :: String in json $ object ["msg" .= msg]
 
