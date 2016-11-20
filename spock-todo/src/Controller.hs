@@ -91,5 +91,14 @@ removePost pid = do
       deletePost pid
       return APIResult {ok=True, output="Post deleted."}
 
-getPost :: Int64 -> Query (Maybe Post)
-getPost = getPostById
+getPost :: Int64 -> Query Value
+getPost pid = do
+  post <- getPostById pid
+  case post of
+    Just p -> return $ object ["ok" .= True, "output" .= p]
+    Nothing -> return $ object ["ok" .= False, "output" .= ("Post not found." :: String)]
+
+getPosts :: Query Value
+getPosts = do
+  posts <- allPostIdTitles
+  return $ object ["ok" .= True, "output" .= posts]
