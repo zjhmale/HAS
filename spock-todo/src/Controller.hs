@@ -1,6 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE RankNTypes #-}
+
 module Controller where
 
 import GHC.Generics (Generic)
@@ -88,3 +91,5 @@ removePost pid = do
       deletePost pid
       return APIResult {ok=True, output="Post deleted."}
 
+getPost :: Int64 -> Query (Maybe Post)
+getPost = getPostById

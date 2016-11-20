@@ -46,6 +46,13 @@ app = do
       r <- runQuery' $ removePost pid
       json r
 
+    get ("posts" <//> var) $ \pid ->
+      requireAuth onfail $ \_ -> do
+      r <- runQuery' (getPost pid)
+      case r of
+        Just p -> json $ object ["ok" .= True, "output" .= p]
+        Nothing -> json $ object ["ok" .= False, "output" .= ("Post not found." :: String)]
+
     post "login" $ do
       username <- param' "username"
       password <- param' "password"
