@@ -31,9 +31,9 @@ app = do
 
     get root $ let msg = "welcome" :: String in json $ object ["msg" .= msg]
 
-    post "posts" $
+    post "posts" $ do
       requireAuth onfail $ \(uid, _) ->
-      jsonBody' >>= runQuery' . newPost uid >>= json
+        jsonBody' >>= runQuery' . newPost uid >>= json
 
     put ("posts" <//> var) $ \pid ->
       requireAuth onfail $ \(uid, _) ->

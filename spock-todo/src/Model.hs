@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE EmptyDataDecls             #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GADTs                      #-}
@@ -33,7 +32,6 @@ import           Control.Arrow
 import           Control.Monad.Logger
 import           Control.Monad.Reader
 import           Control.Monad.Trans.Resource (runResourceT)
-import           Data.Aeson
 import           Data.Int                     (Int64)
 import           Data.Text                    (Text)
 import           Data.Time
@@ -41,7 +39,6 @@ import           Database.Esqueleto
 import           Database.Persist.MySQL       hiding (delete, update, (=.),
                                                (==.))
 import           Database.Persist.TH
-import           GHC.Generics                 (Generic)
 import           Web.Spock.Config
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
@@ -79,11 +76,6 @@ getAppCfg = do
   return $ appCfg { spc_maxRequestSize = Just (5 * 1024 * 1024)
                   , spc_sessionCfg = sessionCfg'
                   }
-  {-
-  runResourceT . runStdoutLoggingT $ withMySQLPool connectionInfo 10 $ \pool -> liftIO $ do
-    runSqlPersistMPool (runMigration migrateAll) pool
-    action pool
-  -}
 
 data Env = Env {
     sqlHandler :: SqlBackend

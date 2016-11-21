@@ -1,6 +1,6 @@
 module Main where
 
-import Route (run)
+import           Route (run)
 
 main :: IO ()
 main = run

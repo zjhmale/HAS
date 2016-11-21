@@ -42,11 +42,12 @@ library
                      , wai-extra
                      , Spock
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 executable spock-todo
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:       base
                      , spock-todo
                      , text
@@ -65,6 +66,7 @@ test-suite spock-todo-test
                      , wai
                      , wai-extra
                      , Spock
+                     , Spock-core
                      , hspec
                      , hspec-wai
                      , hspec-wai-json
@@ -73,8 +75,10 @@ test-suite spock-todo-test
                      , persistent-mysql
                      , esqueleto
                      , monad-logger
+                     , bytestring
+                     , text
                      , QuickCheck
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
   default-language:    Haskell2010
 
 source-repository head

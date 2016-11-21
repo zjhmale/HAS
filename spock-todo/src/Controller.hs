@@ -9,7 +9,6 @@ module Controller where
 import           Control.Monad.Reader
 import           Crypto.PasswordStore
 import           Data.Aeson
-import           Data.ByteString.Lazy (ByteString)
 import           Data.Int             (Int64)
 import           Data.Text            as T
 import           Data.Text.Encoding   (decodeUtf8, encodeUtf8)
@@ -89,7 +88,7 @@ removePost pid uid = do
   maybeOrig <- getPostById pid
   case maybeOrig of
     Nothing -> return APIResult {ok=False, output="Post not found."}
-    Just orig@Post{..} ->
+    Just Post{..} ->
       if fromSqlKey postAuthorId == uid
       then do
         deletePost pid
