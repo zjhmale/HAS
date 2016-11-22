@@ -1,8 +1,8 @@
 module Main where
 
-import           Route (run)
-import           System.Environment                   (lookupEnv)
-import Config
+import           Config
+import           Route              (run)
+import           System.Environment (lookupEnv)
 
 main :: IO ()
 main = do

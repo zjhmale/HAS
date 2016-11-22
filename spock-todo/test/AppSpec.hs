@@ -9,21 +9,21 @@
 
 module AppSpec where
 
-import           Web.Spock                  hiding (json)
+import           Config
 import           Control.Monad.IO.Class     (liftIO)
 import           Data.List                  (find)
 import           Data.Maybe                 (fromMaybe)
 import           Data.Monoid
 import qualified Data.Text                  as T
 import qualified Data.Text.Encoding         as TE
-import           Route (getAppCfg)
-import Config
 import qualified Network.Wai                as Wai
 import qualified Network.Wai.Test           as Test hiding (request)
+import           Route                      (getAppCfg)
 import           Route                      (spockApp)
 import           Test.Hspec
 import qualified Test.Hspec.Wai             as Test
 import           Test.Hspec.Wai.JSON
+import           Web.Spock                  hiding (json)
 import           Web.Spock.Internal.Cookies
 
 getSessCookie :: Test.SResponse -> Maybe T.Text

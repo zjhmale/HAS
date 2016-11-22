@@ -1,10 +1,11 @@
-{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Config where
 
+import           Database.Persist.MySQL               hiding (delete, update,
+                                                       (=.), (==.))
 import           Network.Wai                          (Middleware)
 import           Network.Wai.Middleware.RequestLogger (logStdout, logStdoutDev)
-import           Database.Persist.MySQL       hiding (delete, update, (=.), (==.))
 
 connectionInfo :: Environment -> ConnectInfo
 connectionInfo env = defaultConnectInfo
@@ -17,7 +18,7 @@ connectionInfo env = defaultConnectInfo
 
 data Config = Config
   { sqlHandler :: SqlBackend
-  , getEnv  :: Environment
+  , getEnv     :: Environment
   }
 
 data Environment

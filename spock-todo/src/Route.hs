@@ -3,20 +3,20 @@
 
 module Route where
 
+import           Config
 import           Control.Monad.Logger
 import           Control.Monad.Reader
-import           Control.Monad.Trans.Resource (runResourceT)
-import           Database.Persist.MySQL       hiding (delete, update, (=.),
-                                               (==.), get)
+import           Control.Monad.Trans.Resource         (runResourceT)
 import           Controller
 import           Data.Aeson                           (object, (.=))
 import           Data.Int                             (Int64)
+import           Database.Persist.MySQL               hiding (delete, get,
+                                                       update, (=.), (==.))
 import           Model
 import           Network.Wai
 import           Network.Wai.Middleware.RequestLogger
 import           Web.Spock
 import           Web.Spock.Config
-import Config
 
 getAppCfg :: Environment -> IO (SpockCfg SqlBackend (Maybe (Int64, User)) ())
 getAppCfg env = do

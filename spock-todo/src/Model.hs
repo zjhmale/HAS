@@ -27,14 +27,14 @@ module Model(
 , Post(..)
 ) where
 
+import           Config
 import           Control.Arrow
 import           Control.Monad.Reader
-import           Data.Int                     (Int64)
-import           Data.Text                    (Text)
+import           Data.Int             (Int64)
+import           Data.Text            (Text)
 import           Data.Time
 import           Database.Esqueleto
 import           Database.Persist.TH
-import Config
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 User json
