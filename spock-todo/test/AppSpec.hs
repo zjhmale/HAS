@@ -16,7 +16,8 @@ import           Data.Maybe                 (fromMaybe)
 import           Data.Monoid
 import qualified Data.Text                  as T
 import qualified Data.Text.Encoding         as TE
-import           Model                      (getAppCfg)
+import           Route (getAppCfg)
+import Config
 import qualified Network.Wai                as Wai
 import qualified Network.Wai.Test           as Test hiding (request)
 import           Route                      (spockApp)
@@ -34,7 +35,7 @@ getSessCookie resp =
 
 spec :: Spec
 spec = describe "Todo App" $
-  Test.with testApp $ it "should response with 'welcome' and 200 status" $ do
+  Test.with (testApp Test) $ it "should response with 'welcome' and 200 status" $ do
     Test.get "/" `Test.shouldRespondWith` [json|{msg:"welcome"}|] { Test.matchStatus = 200 }
     Test.postHtmlForm "/login" [("username", "cleantha"), ("password", "cleantha"), ("type", "signup")] `Test.shouldRespondWith` [json|{ok:true, err:"1"}|] { Test.matchStatus = 200 }
     Test.postHtmlForm "/login" [("username", "cleantha"), ("password", "cleantha"), ("type", "login")] `Test.shouldRespondWith` [json|{ok:true, err:"success"}|] { Test.matchStatus = 200 }
@@ -46,7 +47,7 @@ spec = describe "Todo App" $
     liftIO $ print sessCookie
     Test.request "POST" "/posts" headers "{\"title\": \"post-title\",\"content\": \"post-content\"}" `Test.shouldRespondWith` [json|{ok:true, output:"New post #1 created."}|] { Test.matchStatus = 200 }
 
-testApp :: IO Wai.Application
-testApp = do
-  appCfg <- getAppCfg
-  spockAsApp $ spockApp appCfg
+testApp :: Environment -> IO Wai.Application
+testApp env = do
+  appCfg <- getAppCfg env
+  spockAsApp $ spockApp env appCfg
