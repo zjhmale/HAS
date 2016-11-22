@@ -11,7 +11,6 @@
 
 module Model(
   connectionInfo
-, getAppCfg
 , Query
 , allPostIdTitles
 , getPostById
@@ -26,20 +25,16 @@ module Model(
 , migrateAll
 , User(..)
 , Post(..)
-, Env(..)) where
+) where
 
 import           Control.Arrow
-import           Control.Monad.Logger
 import           Control.Monad.Reader
-import           Control.Monad.Trans.Resource (runResourceT)
 import           Data.Int                     (Int64)
 import           Data.Text                    (Text)
 import           Data.Time
 import           Database.Esqueleto
-import           Database.Persist.MySQL       hiding (delete, update, (=.),
-                                               (==.))
 import           Database.Persist.TH
-import           Web.Spock.Config
+import Config
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 User json
@@ -54,35 +49,7 @@ Post json
     deriving Show
 |]
 
-connectionInfo :: ConnectInfo
-connectionInfo = defaultConnectInfo
-  { connectPort = 3306
-  , connectHost = "127.0.0.1"
-  , connectUser = "root"
-  , connectPassword = "cleantha"
-  , connectDatabase = "todo"
-  }
-
-getAppCfg :: IO (SpockCfg SqlBackend (Maybe (Int64, User)) ())
-getAppCfg = do
-  sessionCfg <- defaultSessionCfg Nothing
-  let sessionCfg' = sessionCfg { sc_cookieName = "todo"
-                               , sc_sessionTTL = 604800 -- one week
-                               }
-
-  pool <- runStdoutLoggingT $ createMySQLPool connectionInfo 10
-  runResourceT . runStdoutLoggingT . liftIO $ runSqlPersistMPool (runMigration migrateAll) pool
-  appCfg <- defaultSpockCfg Nothing (PCPool pool) ()
-  return $ appCfg { spc_maxRequestSize = Just (5 * 1024 * 1024)
-                  , spc_sessionCfg = sessionCfg'
-                  }
-
-data Env = Env {
-    sqlHandler :: SqlBackend
-  , currUser   :: Maybe (Int64, User)
-  }
-
-type Query a = ReaderT Env IO a
+type Query a = ReaderT Config IO a
 
 runDb :: SqlPersistM a -> Query a
 runDb query = asks sqlHandler >>= lift . runSqlPersistM query

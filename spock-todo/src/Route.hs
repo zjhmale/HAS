@@ -3,35 +3,52 @@
 
 module Route where
 
+import           Control.Monad.Logger
 import           Control.Monad.Reader
+import           Control.Monad.Trans.Resource (runResourceT)
+import           Database.Persist.MySQL       hiding (delete, update, (=.),
+                                               (==.), get)
 import           Controller
 import           Data.Aeson                           (object, (.=))
 import           Data.Int                             (Int64)
 import           Model
 import           Network.Wai
 import           Network.Wai.Middleware.RequestLogger
-import           System.Environment                   (lookupEnv)
 import           Web.Spock
 import           Web.Spock.Config
+import Config
 
-run :: IO ()
-run = do
-  port <- maybe 3000 read <$> lookupEnv "PORT"
-  appCfg <- getAppCfg
-  runSpock port $ spockApp appCfg
+getAppCfg :: Environment -> IO (SpockCfg SqlBackend (Maybe (Int64, User)) ())
+getAppCfg env = do
+  sessionCfg <- defaultSessionCfg Nothing
+  let sessionCfg' = sessionCfg { sc_cookieName = "todo"
+                               , sc_sessionTTL = 604800 -- one week
+                               }
 
-spockApp :: SpockCfg SqlBackend (Maybe (Int64, User)) state
+  pool <- runStdoutLoggingT $ createMySQLPool (connectionInfo env) (envPool env)
+  runResourceT . runStdoutLoggingT . liftIO $ runSqlPersistMPool (runMigration migrateAll) pool
+  appCfg <- defaultSpockCfg Nothing (PCPool pool) ()
+  return $ appCfg { spc_maxRequestSize = Just (5 * 1024 * 1024)
+                  , spc_sessionCfg = sessionCfg'
+                  }
+
+run :: Int -> Environment -> IO ()
+run port env = do
+  appCfg <- getAppCfg env
+  runSpock port $ spockApp env appCfg
+
+spockApp :: Environment -> SpockCfg SqlBackend (Maybe (Int64, User)) state
          -> IO Middleware
-spockApp cfg = spock cfg app
+spockApp env cfg = spock cfg $ app env
 
-app :: SpockM SqlBackend (Maybe (Int64, User)) state ()
-app = do
+app :: Environment -> SpockM SqlBackend (Maybe (Int64, User)) state ()
+app env = do
     middleware logStdoutDev
     let onfail = json $ object ["ok" .= False, "err" .= ("Session expired." :: String)]
 
     get root $ let msg = "welcome" :: String in json $ object ["msg" .= msg]
 
-    post "posts" $ do
+    post "posts" $
       requireAuth onfail $ \(uid, _) ->
         jsonBody' >>= runQuery' . newPost uid >>= json
 
@@ -72,6 +89,6 @@ app = do
         Just user -> action user
 
     runQuery' action = do
-      sess <- readSession
+      _ <- readSession
       runQuery $ \conn ->
-        liftIO (runReaderT action (Env conn sess))
+        liftIO (runReaderT action (Config conn env))

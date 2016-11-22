@@ -17,6 +17,7 @@ library
   exposed-modules:     Model
                      , Controller
                      , Route
+                     , Config
   build-depends:       base
                      , text
                      , bytestring
