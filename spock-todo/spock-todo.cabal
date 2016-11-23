@@ -18,6 +18,7 @@ library
                      , Controller
                      , Route
                      , Config
+  other-modules:       Paths_spock_todo
   build-depends:       base
                      , text
                      , bytestring
