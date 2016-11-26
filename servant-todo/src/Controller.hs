@@ -6,8 +6,9 @@
 
 module Controller where
 
+import           Control.Monad.Trans.Except
+import           Servant hiding (Handler)
 import           Control.Monad.Reader
-import           Crypto.PasswordStore
 import           Data.Aeson
 import           Data.Int             (Int64)
 import           Data.Text            as T
@@ -15,40 +16,10 @@ import           Data.Text.Encoding   (decodeUtf8, encodeUtf8)
 import           Data.Time
 import           GHC.Generics         (Generic)
 import           Model
+import Config
 
-loginSignupPost :: Text -> Text -> Text -> Query (Value, Maybe (Int64, User))
-loginSignupPost username password _type = do
-  maybeUser <- getUserByUsername username
-  (ok', err', sess) <-
-    if T.length username < 6 || T.length password < 6
-       then return (False, "Length of username and password should be at least 6.", Nothing)
-       else
-         case _type of
-           "login" ->
-             case maybeUser of
-               Nothing -> return (False, "User not found.", Nothing)
-               Just userWithId@(_, user) ->
-                 if verifyPassword (encodeUtf8 password) $ encodeUtf8 (userPassword user)
-                   then return (True, "success", Just userWithId)
-                   else return (False, "Wrong password.", Nothing)
-           "signup" ->
-             case maybeUser of
-               Just _ -> return (False, "Username is already used.", Nothing)
-               Nothing -> do
-                 salt <- liftIO genSaltIO
-                 let hashPassword =  decodeUtf8 $ makePasswordSalt (encodeUtf8 password) salt 17
-                 userid <- addUser username hashPassword
-                 insertedUser <- getUserByUsername username
-                 return (True, show . fromSqlKey $ userid, insertedUser)
-           _ -> return (False, "?", Nothing)
-  return (object ["ok" .= ok', "err" .= err'], sess)
-
-data APIResult = APIResult {
-    ok     :: Bool
-  , output :: String
-  } deriving Generic
-
-instance ToJSON APIResult
+-- customize handler type, add a reader monad stack.
+type Handler = ReaderT Config (ExceptT ServantErr IO)
 
 data PostView = PostView
   { title   :: Text
@@ -57,6 +28,28 @@ data PostView = PostView
 
 instance FromJSON PostView
 
+welcome :: Handler Value
+welcome = return $ object ["msg" .= ("welcome" :: String)]
+
+apiResult :: ToJSON a => Bool -> a -> Value
+apiResult status result = object ["ok" .= status, "output" .= result]
+
+getAllPosts :: Handler Value
+getAllPosts = return $ apiResult True ([] :: [Int64])
+
+getPost :: Int64 -> Handler Value
+getPost id = return $ apiResult True id
+
+createPost :: PostView -> Handler Value
+createPost pv = return $ apiResult True (0 :: Int64)
+
+updatePost :: Int64 -> PostView -> Handler Value
+updatePost id pv = return $ apiResult True id
+
+deletePost :: Int64 -> Handler Value
+deletePost id = return $ apiResult True id
+
+{-
 newPost :: Int64 -> PostView -> Query APIResult
 newPost uid (PostView title content) = do
   t <- liftIO getCurrentTime
@@ -106,3 +99,4 @@ getPosts :: Query Value
 getPosts = do
   posts <- allPostIdTitles
   return $ object ["ok" .= True, "output" .= posts]
+-}

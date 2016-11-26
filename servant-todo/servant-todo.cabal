@@ -18,7 +18,7 @@ library
   exposed-modules:     Route
                      , Model
                      , Config
-                     --, Controller
+                     , Controller
   build-depends:       base >= 4.7 && < 5
                      , persistent
                      , persistent-template
