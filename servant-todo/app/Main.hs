@@ -1,7 +1,20 @@
 module Main where
 
-import           Network.Wai.Handler.Warp
+import           Network.Wai.Handler.Warp (run)
 import           Route                    (app)
+import           System.Environment (lookupEnv)
+import Model
+import Config
+import Database.Persist.MySQL (runSqlPool)
 
 main :: IO ()
-main = run 8080 app
+main = do
+  env  <- maybe Development read <$> lookupEnv "ENV"
+  port <- maybe 8080 read <$> lookupEnv "PORT"
+  pool <- makePool env
+  let cfg = Config { getPool = pool
+                   , getEnv = env
+                   }
+      logger = setLogger env
+  runSqlPool doMigrations pool
+  run port $ logger $ app cfg

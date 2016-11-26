@@ -1,56 +1,61 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE DeriveGeneric             #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Route where
 
+import Control.Monad.Reader         (ReaderT, runReaderT, lift)
+import Data.Text as T hiding (map)
 import           Control.Monad.Trans.Except
 import           Data.Proxy
-import           Servant
+import           Servant hiding (Handler)
 import           Data.Aeson
 import           GHC.Generics         (Generic)
+import           Data.Int             (Int64)
+import           Model hiding (Post)
+import Config
 
 type API
-    -- GET /things
-    = "things" :> Get '[JSON] [Thing]
-    -- GET /things/:id
-    :<|> "things" :> Capture "id" Integer :> Get '[JSON] Thing
+  = "welcome" :> Get '[JSON] Value
+  -- :<|> "posts" :> Get '[JSON] Value
+  -- :<|> "posts" :> Capture "id" Int64 :> Get '[JSON] Value
+  -- :<|> "posts" :> ReqBody '[JSON] PostView :> Post '[JSON] APIResult
+  -- :<|> "posts" :> Capture "id" Int64 :> ReqBody '[JSON] PostView :> Put '[JSON] APIResult
+  -- :<|> "posts" :> Capture "id" Int64 :> Delete '[JSON] APIResult
 
 api :: Proxy API
 api = Proxy
 
--- This is Servant's default handler type uses ExceptT.
--- type Handler a = EitherT ServantErr IO a
+-- customize handler type, add a reader monad stack.
+type Handler = ReaderT Config (ExceptT ServantErr IO)
 
-data Thing = Thing Integer
-           deriving (Generic)
+data APIResult = APIResult {
+    ok     :: Bool
+  , output :: String
+  } deriving Generic
 
-instance ToJSON Thing
+instance ToJSON APIResult
 
-getThingsFromDB :: Handler [Thing]
-getThingsFromDB = return $ map Thing [1..3]
+data PostView = PostView
+  { title   :: Text
+  , content :: Text
+  } deriving Generic
 
-getThingFromDB :: Integer -> Handler (Maybe Thing)
-getThingFromDB = return . Just . Thing
+instance FromJSON PostView
 
-getThings :: Handler [Thing]
-getThings = do
-    things <- getThingsFromDB
-    return things
+app :: Config -> Application
+app cfg = serve api (readerServer cfg)
 
-getThing :: Integer -> Handler Thing
-getThing thingID = do
-    maybeThing <- getThingFromDB thingID
-    case maybeThing of
-        Just thing -> return thing
-        Nothing -> throwE err404
+readerServer :: Config -> Server API
+readerServer cfg = enter (readerToEither cfg) server
 
-server :: Server API
+readerToEither :: Config -> Handler :~> ExceptT ServantErr IO
+readerToEither cfg = Nat $ \x -> runReaderT x cfg
+
+welcomeHandler :: Handler Value
+welcomeHandler = return $ object ["msg" .= ("welcome" :: String)]
+
+server :: ServerT API Handler
 server
-    -- GET /things
-    = getThings
-    -- GET /things/:id
-    :<|> getThing
-
-app :: Application
-app = serve api server
+  = welcomeHandler

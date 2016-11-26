@@ -2,5 +2,23 @@ flags: {}
 extra-package-dbs: []
 packages:
 - '.'
-extra-deps: []
+extra-deps:
+- aeson-0.11.2.1
+- call-stack-0.1.0
+- conduit-extra-1.1.15
+- esqueleto-2.4.3
+- hspec-2.3.2
+- hspec-core-2.3.2
+- hspec-discover-2.3.2
+- hspec-expectations-0.8.2
+- http-api-data-0.2.4
+- mysql-0.1.4
+- mysql-simple-0.2.2.5
+- persistent-2.2.4.1
+- persistent-mysql-2.3.0.2
+- persistent-template-2.1.8.1
+- servant-0.8.1
+- servant-server-0.8.1
+- wai-extra-3.0.19
+- warp-3.2.9
 resolver: nightly-2016-10-07
