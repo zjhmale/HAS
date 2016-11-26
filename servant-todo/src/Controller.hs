@@ -6,9 +6,6 @@
 
 module Controller where
 
-import           Control.Monad.Trans.Except
-import           Servant hiding (Handler)
-import           Control.Monad.Reader
 import           Data.Aeson
 import           Data.Int             (Int64)
 import           Data.Text            as T
@@ -17,9 +14,6 @@ import           Data.Time
 import           GHC.Generics         (Generic)
 import           Model
 import Config
-
--- customize handler type, add a reader monad stack.
-type Handler = ReaderT Config (ExceptT ServantErr IO)
 
 data PostView = PostView
   { title   :: Text

@@ -23,7 +23,6 @@ library
                      , persistent
                      , persistent-template
                      , persistent-mysql
-                     , esqueleto
                      , monad-logger
                      , servant-server
                      , either
