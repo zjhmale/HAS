@@ -35,7 +35,7 @@ getSessCookie resp =
 
 spec :: Spec
 spec = describe "Todo App" $
-  Test.with (testApp Test) $ it "should response with 'welcome' and 200 status" $ do
+  Test.with (testApp Test) $ it "should regist, login and create a new post" $ do
     Test.get "/" `Test.shouldRespondWith` [json|{msg:"welcome"}|] { Test.matchStatus = 200 }
     Test.postHtmlForm "/login" [("username", "cleantha"), ("password", "cleantha"), ("type", "signup")] `Test.shouldRespondWith` [json|{ok:true, err:"1"}|] { Test.matchStatus = 200 }
     Test.postHtmlForm "/login" [("username", "cleantha"), ("password", "cleantha"), ("type", "login")] `Test.shouldRespondWith` [json|{ok:true, err:"success"}|] { Test.matchStatus = 200 }

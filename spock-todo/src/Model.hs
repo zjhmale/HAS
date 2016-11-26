@@ -10,8 +10,7 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Model(
-  connectionInfo
-, Query
+  Query
 , allPostIdTitles
 , getPostById
 , updatePost
