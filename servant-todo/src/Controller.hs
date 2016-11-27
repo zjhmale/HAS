@@ -33,7 +33,11 @@ getAllPosts :: Handler Value
 getAllPosts = return $ apiResult True ([] :: [Int64])
 
 getPost :: Int64 -> Handler Value
-getPost id = return $ apiResult True id
+getPost pid = do
+  post <- getPostById pid
+  case post of
+    Just p -> return $ apiResult True p
+    Nothing -> return $ apiResult False ("Post not found" :: String)
 
 createPost :: PostView -> Handler Value
 createPost PostView{..} = do
