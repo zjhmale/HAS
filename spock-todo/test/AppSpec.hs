@@ -18,8 +18,7 @@ import qualified Data.Text                  as T
 import qualified Data.Text.Encoding         as TE
 import qualified Network.Wai                as Wai
 import qualified Network.Wai.Test           as Test hiding (request)
-import           Route                      (getAppCfg)
-import           Route                      (spockApp)
+import           Route                      (getAppCfg, spockApp)
 import           Test.Hspec
 import qualified Test.Hspec.Wai             as Test
 import           Test.Hspec.Wai.JSON
