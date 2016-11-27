@@ -55,24 +55,18 @@ editPost pid PostView{..} = do
                       , postContent = content
                       }
       updatePost pid post
-      return $ apiResult True pid
+      return $ apiResult True ("Post updated" :: String)
 
 removePost :: Int64 -> Handler Value
-removePost id = return $ apiResult True id
-
-{-
-removePost :: Int64 -> Int64 -> Query APIResult
-removePost pid uid = do
+removePost pid = do
   maybeOrig <- getPostById pid
   case maybeOrig of
-    Nothing -> return APIResult {ok=False, output="Post not found."}
-    Just Post{..} ->
-      if fromSqlKey postAuthorId == uid
-      then do
-        deletePost pid
-        return APIResult {ok=True, output="Post deleted."}
-      else return APIResult {ok=False, output="Not authorized."}
+    Nothing -> return $ apiResult False ("Post not found" :: String)
+    Just Post{..} -> do
+      deletePost pid
+      return $ apiResult True ("Post deleted." :: String)
 
+{-
 getPost :: Int64 -> Query Value
 getPost pid = do
   post <- getPostById pid
