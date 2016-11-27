@@ -6,6 +6,7 @@
 
 module Controller where
 
+import           Control.Monad.IO.Class     (liftIO)
 import           Data.Aeson
 import           Data.Int             (Int64)
 import           Data.Text            as T
@@ -35,26 +36,22 @@ getPost :: Int64 -> Handler Value
 getPost id = return $ apiResult True id
 
 createPost :: PostView -> Handler Value
-createPost pv = return $ apiResult True (0 :: Int64)
-
-updatePost :: Int64 -> PostView -> Handler Value
-updatePost id pv = return $ apiResult True id
-
-deletePost :: Int64 -> Handler Value
-deletePost id = return $ apiResult True id
-
-{-
-newPost :: Int64 -> PostView -> Query APIResult
-newPost uid (PostView title content) = do
+createPost (PostView title content) = do
   t <- liftIO getCurrentTime
-  let post = Post { postAuthorId = toSqlKey uid
-                  , postTitle = title
+  let post = Post { postTitle = title
                   , postContent = content
                   , postCreatedAt = addUTCTime (8 * 3600) t -- UTC+8
                   }
   newid <- insertPost post
-  return APIResult {ok=True, output="New post #" ++ show newid ++ " created."}
+  return $ apiResult True newid
 
+editPost :: Int64 -> PostView -> Handler Value
+editPost id pv = return $ apiResult True id
+
+removePost :: Int64 -> Handler Value
+removePost id = return $ apiResult True id
+
+{-
 editPost :: Int64 -> Int64 -> PostView -> Query APIResult
 editPost pid uid (PostView title content) = do
   maybeOrig <- getPostById pid

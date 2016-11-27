@@ -14,16 +14,13 @@
 
 module Model(
   connectionInfo
---, allPostIdTitles
---, getPostById
---, updatePost
---, insertPost
---, deletePost
---, addUser
---, getUserByUsername
---, SqlBackend
---, fromSqlKey
---, toSqlKey
+, allPostIdTitles
+, getPostById
+, updatePost
+, insertPost
+, deletePost
+, fromSqlKey
+, toSqlKey
 , doMigrations
 , Post(..)
 ) where
@@ -81,14 +78,14 @@ getPostById postId = do
 insertPost :: Post -> Handler Int64
 insertPost post = fromSqlKey <$> runDb (insert post)
 
-editPost :: Int64 -> Post -> Handler ()
-editPost pid Post{..} = do
+updatePost :: Int64 -> Post -> Handler ()
+updatePost pid Post{..} = do
   runDb $ updateWhere [PostId ==. toSqlKey pid] [ PostTitle   =. postTitle
                                                 , PostContent =. postContent
                                                 ]
   return ()
 
-removePost :: Int64 -> Handler ()
-removePost pid = do
+deletePost :: Int64 -> Handler ()
+deletePost pid = do
   runDb $ deleteWhere [PostId ==. toSqlKey pid]
   return ()

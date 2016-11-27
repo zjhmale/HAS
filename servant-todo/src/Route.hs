@@ -17,13 +17,16 @@ import           Model hiding (Post)
 import Controller
 import Config
 
+type PostAPI
+  = Get '[JSON] Value
+  :<|> Capture "id" Int64 :> Get '[JSON] Value
+  :<|> ReqBody '[JSON] PostView :> Post '[JSON] Value
+  :<|> Capture "id" Int64 :> ReqBody '[JSON] PostView :> Put '[JSON] Value
+  :<|> Capture "id" Int64 :> Delete '[JSON] Value
+
 type API
   = "welcome" :> Get '[JSON] Value
-  :<|> "posts" :> Get '[JSON] Value
-  :<|> "posts" :> Capture "id" Int64 :> Get '[JSON] Value
-  :<|> "posts" :> ReqBody '[JSON] PostView :> Post '[JSON] Value
-  :<|> "posts" :> Capture "id" Int64 :> ReqBody '[JSON] PostView :> Put '[JSON] Value
-  :<|> "posts" :> Capture "id" Int64 :> Delete '[JSON] Value
+  :<|> "posts" :> PostAPI
 
 api :: Proxy API
 api = Proxy
@@ -43,5 +46,5 @@ server
   :<|> getAllPosts
   :<|> getPost
   :<|> createPost
-  :<|> updatePost
-  :<|> deletePost
+  :<|> editPost
+  :<|> removePost

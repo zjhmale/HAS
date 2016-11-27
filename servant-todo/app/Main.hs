@@ -17,4 +17,5 @@ main = do
                    }
       logger = setLogger env
   runSqlPool doMigrations pool
+  putStrLn $ "Server is running on port " ++ show port
   run port $ logger $ app cfg
