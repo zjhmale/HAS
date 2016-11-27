@@ -43,7 +43,7 @@ readerToEither cfg = Nat $ \x -> runReaderT x cfg
 server :: ServerT API Handler
 server
   = welcome
-  :<|> getAllPosts
+  :<|> getPosts
   :<|> getPost
   :<|> createPost
   :<|> editPost

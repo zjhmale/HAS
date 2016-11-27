@@ -53,11 +53,11 @@ runDb query = do
     pool <- asks getPool
     liftIO $ runSqlPool query pool
 
-allPostIdTitles :: Handler [Post]
+allPostIdTitles :: Handler [(Int64, Text)]
 allPostIdTitles = do
   posts <- runDb $ selectList [] [Asc PostId]
-  let posts' = map (\(Entity _ y) -> y) posts
-  return posts'
+  let pairs = map (\(Entity key Post{..}) -> (fromSqlKey key, postTitle)) posts
+  return pairs
   {-
   runDb $ do
   idTitles <- select $

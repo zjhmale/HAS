@@ -29,8 +29,10 @@ welcome = return $ object ["msg" .= ("welcome" :: String)]
 apiResult :: ToJSON a => Bool -> a -> Value
 apiResult status result = object ["ok" .= status, "output" .= result]
 
-getAllPosts :: Handler Value
-getAllPosts = return $ apiResult True ([] :: [Int64])
+getPosts :: Handler Value
+getPosts = do
+  posts <- allPostIdTitles
+  return $ apiResult True posts
 
 getPost :: Int64 -> Handler Value
 getPost pid = do
@@ -69,17 +71,3 @@ removePost pid = do
     Just Post{..} -> do
       deletePost pid
       return $ apiResult True ("Post deleted." :: String)
-
-{-
-getPost :: Int64 -> Query Value
-getPost pid = do
-  post <- getPostById pid
-  case post of
-    Just p -> return $ object ["ok" .= True, "output" .= p]
-    Nothing -> return $ object ["ok" .= False, "output" .= ("Post not found." :: String)]
-
-getPosts :: Query Value
-getPosts = do
-  posts <- allPostIdTitles
-  return $ object ["ok" .= True, "output" .= posts]
--}
