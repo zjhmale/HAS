@@ -22,7 +22,7 @@ type PostAPI
   :<|> Capture "id" Int64 :> Delete '[JSON] Value
 
 type API
-  = "welcome" :> Get '[JSON] Value
+  = Get '[JSON] Value
   :<|> "posts" :> PostAPI
 
 api :: Proxy API
