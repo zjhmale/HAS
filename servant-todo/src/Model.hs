@@ -67,13 +67,13 @@ allPostIdTitles = do
   return $ ((fromSqlKey . unValue) *** unValue) <$> idTitles
   -}
 
-getPostById :: Int64 -> Handler Post
+getPostById :: Int64 -> Handler (Maybe Post)
 getPostById postId = do
   posts <- runDb $ selectList [PostId ==. toSqlKey postId] []
   let posts' = map (\(Entity _ y) -> y) posts
   case posts' of
-    []       -> lift $ throwE err404
-    (post:_) -> return post
+    []       -> return Nothing
+    (post:_) -> return . Just $ post
 
 insertPost :: Post -> Handler Int64
 insertPost post = fromSqlKey <$> runDb (insert post)
