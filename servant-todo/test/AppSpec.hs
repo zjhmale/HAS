@@ -9,13 +9,13 @@
 
 module AppSpec where
 
-import           Database.Persist.MySQL   (runSqlPool)
 import           Config
-import qualified Network.Wai                as Wai
-import           Route                      (app)
-import Model
+import           Database.Persist.MySQL (runSqlPool)
+import           Model
+import qualified Network.Wai            as Wai
+import           Route                  (app)
 import           Test.Hspec
-import qualified Test.Hspec.Wai             as Test
+import qualified Test.Hspec.Wai         as Test
 import           Test.Hspec.Wai.JSON
 
 spec :: Spec
