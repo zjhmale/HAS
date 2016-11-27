@@ -1,4 +1,6 @@
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -8,9 +10,7 @@
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators              #-}
 
 module Model(
   connectionInfo
@@ -25,17 +25,17 @@ module Model(
 , Post(..)
 ) where
 
-import           Servant hiding (Handler, Post)
-import Control.Monad.Trans.Except (throwE)
 import           Config
---import           Control.Arrow
 import           Control.Monad.Reader
---import           Data.Int             (Int64)
-import           Data.Text            (Text)
+import           Data.Int               (Int64)
+import           Data.Text              (Text)
 import           Data.Time
+import           Database.Persist.MySQL (Entity (..), SelectOpt (..),
+                                         SqlBackend, SqlPersistT, deleteWhere,
+                                         fromSqlKey, insert, runMigration,
+                                         runSqlPool, selectList, toSqlKey,
+                                         updateWhere, (=.), (==.))
 import           Database.Persist.TH
-import           Data.Int             (Int64)
-import Database.Persist.MySQL (insert, deleteWhere, selectList, Entity(..), runMigration, runSqlPool, updateWhere, toSqlKey, SelectOpt(..), fromSqlKey, (==.), (=.), SqlBackend, SqlPersistT)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Post json
@@ -58,14 +58,6 @@ allPostIdTitles = do
   posts <- runDb $ selectList [] [Asc PostId]
   let pairs = map (\(Entity key Post{..}) -> (fromSqlKey key, postTitle)) posts
   return pairs
-  {-
-  runDb $ do
-  idTitles <- select $
-    from $ \post -> do
-      orderBy [asc (post ^. PostId)]
-      return (post ^. PostId, post ^. PostTitle)
-  return $ ((fromSqlKey . unValue) *** unValue) <$> idTitles
-  -}
 
 getPostById :: Int64 -> Handler (Maybe Post)
 getPostById postId = do

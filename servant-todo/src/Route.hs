@@ -1,21 +1,18 @@
-{-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE DeriveGeneric             #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Route where
 
-import Control.Monad.Reader         (ReaderT, runReaderT, lift)
+import           Config
+import           Control.Monad.Reader       (runReaderT)
 import           Control.Monad.Trans.Except
-import Data.Text as T hiding (map)
-import           Data.Proxy
-import           Servant hiding (Handler)
+import           Controller
 import           Data.Aeson
-import           GHC.Generics         (Generic)
-import           Data.Int             (Int64)
-import           Model hiding (Post)
-import Controller
-import Config
+import           Data.Int                   (Int64)
+import           Data.Proxy
+import           Servant                    hiding (Handler)
 
 type PostAPI
   = Get '[JSON] Value

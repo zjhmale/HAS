@@ -6,15 +6,14 @@
 
 module Controller where
 
-import           Control.Monad.IO.Class     (liftIO)
+import           Config
+import           Control.Monad.IO.Class (liftIO)
 import           Data.Aeson
-import           Data.Int             (Int64)
-import           Data.Text            as T
-import           Data.Text.Encoding   (decodeUtf8, encodeUtf8)
+import           Data.Int               (Int64)
+import           Data.Text              as T
 import           Data.Time
-import           GHC.Generics         (Generic)
+import           GHC.Generics           (Generic)
 import           Model
-import Config
 
 data PostView = PostView
   { title   :: Text

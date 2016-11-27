@@ -1,11 +1,11 @@
 module Main where
 
+import           Config
+import           Database.Persist.MySQL   (runSqlPool)
+import           Model
 import           Network.Wai.Handler.Warp (run)
 import           Route                    (app)
-import           System.Environment (lookupEnv)
-import Model
-import Config
-import Database.Persist.MySQL (runSqlPool)
+import           System.Environment       (lookupEnv)
 
 main :: IO ()
 main = do

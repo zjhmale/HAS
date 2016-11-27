@@ -2,14 +2,15 @@
 
 module Config where
 
+import           Control.Monad.Logger                 (runNoLoggingT,
+                                                       runStdoutLoggingT)
 import           Control.Monad.Reader
 import           Control.Monad.Trans.Except
-import           Servant hiding (Handler)
 import           Database.Persist.MySQL               hiding (delete, update,
                                                        (=.), (==.))
-import Control.Monad.Logger                 (runNoLoggingT, runStdoutLoggingT)
 import           Network.Wai                          (Middleware)
 import           Network.Wai.Middleware.RequestLogger (logStdout, logStdoutDev)
+import           Servant                              hiding (Handler)
 
 -- customize handler type, add a reader monad stack.
 type Handler = ReaderT Config (ExceptT ServantErr IO)
